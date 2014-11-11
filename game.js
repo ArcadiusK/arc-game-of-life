@@ -46,6 +46,14 @@ var game = this;
 var button = document.getElementById("step");
 button.onclick = function(){game.step.call(game);}
 //button.onclick = game.step;
+var button = document.getElementById("auto");
+button.onclick = function(){game.enableAutoPlay.call(game);};
+var button = document.getElementById("pause");
+button.onclick = function(){game.pause.call(game);};
+var button = document.getElementById("reset");
+button.onclick = function(){game.reset.call(game);};
+var button = document.getElementById("clear");
+button.onclick = function(){game.clear.call(game);};
 
   var onCellClick = function (e) {
     // coordinates of cell, in case you need them
@@ -74,14 +82,21 @@ for (var w=0; w<this.width; w++) {
 
 };
 
+
+var arcsize;
 GameOfLife.prototype.step = function () {
   // Here is where you want to loop through all the cells
   // on the board and determine, based on it's neighbors,
   // whether the cell should be dead or alive in the next
   // evolution of the game
-  console.log("clicked")
-  var newstate = [];
 
+arcsize= document.getElementById('size').text;
+
+
+
+
+  var newstate = [];
+//console.log(this)
   for (var w=0; w<this.width; w++) {    
     for (var h=0; h<this.height; h++) {
       var number_of_neighbors = 0;
@@ -100,7 +115,7 @@ GameOfLife.prototype.step = function () {
  // console.log(number_of_neighbors);
  if ((number_of_neighbors===3) && (cell.getAttribute('data-status') == 'dead')) {
   newstate.push([w,h,"alive"])
-  console.log(newstate); 
+ // console.log(newstate); 
 } else if ((number_of_neighbors<2) && (cell.getAttribute('data-status') == 'alive')) {
   newstate.push([w,h,"dead"])
 } else if ((number_of_neighbors>3) && (cell.getAttribute('data-status') == 'alive')) {
@@ -114,16 +129,53 @@ for (var key in newstate) {
   cell.className = newstate[key][2];
    cell.setAttribute('data-status', newstate[key][2]);
 }
-
+  console.log("clicked")
 newstate=[];
 
 };
-
+var s;
 GameOfLife.prototype.enableAutoPlay = function () {
   // Start Auto-Play by running the 'step' function
   // automatically repeatedly every fixed time interval
   
+var arcgame = this;
+s = setInterval(arcgame.step.bind(arcgame), 500);
+  
 };
+
+
+GameOfLife.prototype.pause = function () {
+clearInterval(s);
+  };
+
+  GameOfLife.prototype.reset = function () {
+ for (var w=0; w<this.width; w++) {    
+    for (var h=0; h<this.height; h++) {
+         var cell=document.getElementById(w+'-'+h);
+           if (Math.random()<=0.5) {
+           cell.className = 'dead';
+           cell.setAttribute('data-status', 'dead');
+       } else {
+         cell.className = 'alive';
+           cell.setAttribute('data-status', 'alive');
+       }
+     }
+     }
+  };
+
+GameOfLife.prototype.clear = function () {
+for (var w=0; w<this.width; w++) {    
+    for (var h=0; h<this.height; h++) {
+         var cell=document.getElementById(w+'-'+h);
+           cell.className = 'dead';
+           cell.setAttribute('data-status', 'dead');
+         }
+       }
+   this.pause();    
+  };
+
+
 
 var gol = new GameOfLife(10,10);
 gol.createAndShowBoard();
+
