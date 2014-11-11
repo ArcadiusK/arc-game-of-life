@@ -3,9 +3,24 @@ function GameOfLife(width,height) {
   this.height = height;
 }
 
+var delay=625;
+
 GameOfLife.prototype.createAndShowBoard = function () {
+  
+
+  do{
+    var selection = parseInt(window.prompt("Please size from 2 to 100", ""), 10);
+}while(isNaN(selection) || selection > 100 || selection < 2);
+
+this.width = selection
+this.height = selection
   // create <table> element
   var goltable = document.createElement("tbody");
+
+
+   
+  
+  goltable.id = 'goltable';
   
   // build Table HTML
   var tablehtml = '';
@@ -70,8 +85,6 @@ button.onclick = function(){game.clear.call(game);};
     }
   };
   
- // var cell00 = document.getElementById('0-0');
- // cell00.onclick = onCellClick;
 
 for (var w=0; w<this.width; w++) {
   for (var h=0; h<this.height; h++) {
@@ -80,17 +93,26 @@ for (var w=0; w<this.width; w++) {
   }
 }
 
+// var table = document.getElementById("board");
+// // cells=table.getElementsByTagName('td');
+// // for (var i=0; i<cells.length; i++) {
+
+// // }
+
+// table.onlick = function(event) {
+//   var cell = event.target;
+//   onCellClick.call(cell, event);
+// }
+
 };
 
 
-var arcsize;
+
 GameOfLife.prototype.step = function () {
   // Here is where you want to loop through all the cells
   // on the board and determine, based on it's neighbors,
   // whether the cell should be dead or alive in the next
   // evolution of the game
-
-arcsize= document.getElementById('size').text;
 
 
 
@@ -129,7 +151,7 @@ for (var key in newstate) {
   cell.className = newstate[key][2];
    cell.setAttribute('data-status', newstate[key][2]);
 }
-  console.log("clicked")
+  //console.log("clicked")
 newstate=[];
 
 };
@@ -137,16 +159,35 @@ var s;
 GameOfLife.prototype.enableAutoPlay = function () {
   // Start Auto-Play by running the 'step' function
   // automatically repeatedly every fixed time interval
-  
+  document.getElementById('goltable').className = 'playing';
+audio.play();
+
 var arcgame = this;
-s = setInterval(arcgame.step.bind(arcgame), 500);
+s = setInterval(arcgame.step.bind(arcgame), delay);
   
 };
 
 
 GameOfLife.prototype.pause = function () {
+  document.getElementById('goltable').className = '';
+audio.pause();
+
 clearInterval(s);
   };
+
+ GameOfLife.prototype.plus = function () {
+  delay = delay+50;
+ this.pause();
+  this.enableAutoPlay();
+ console.log(delay);
+ }
+
+  GameOfLife.prototype.minus = function () {
+  delay = delay-50;
+  this.pause();
+  this.enableAutoPlay();
+  console.log(delay);
+  }
 
   GameOfLife.prototype.reset = function () {
  for (var w=0; w<this.width; w++) {    
@@ -164,6 +205,7 @@ clearInterval(s);
   };
 
 GameOfLife.prototype.clear = function () {
+//location.reload;
 for (var w=0; w<this.width; w++) {    
     for (var h=0; h<this.height; h++) {
          var cell=document.getElementById(w+'-'+h);
@@ -171,11 +213,12 @@ for (var w=0; w<this.width; w++) {
            cell.setAttribute('data-status', 'dead');
          }
        }
+       audio.pause();
    this.pause();    
   };
 
 
-
+var audio = new Audio('audio_file.mp3');
 var gol = new GameOfLife(10,10);
 gol.createAndShowBoard();
 
