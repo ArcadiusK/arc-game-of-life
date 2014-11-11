@@ -13,6 +13,7 @@ GameOfLife.prototype.createAndShowBoard = function () {
     tablehtml += "<tr id='row+" + h + "'>";
     for (var w=0; w<this.width; w++) {
       tablehtml += "<td data-status='dead' id='" + w + "-" + h + "'></td>";
+
     }
     tablehtml += "</tr>";
   }
@@ -41,10 +42,15 @@ GameOfLife.prototype.setupBoardEvents = function() {
   // Here is how we would catch a click event on just the 0-0 cell
   // You need to add the click event on EVERY cell on the board
   
+var game = this;
+var button = document.getElementById("step");
+button.onclick = function(){game.step.call(game);}
+//button.onclick = game.step;
+
   var onCellClick = function (e) {
     // coordinates of cell, in case you need them
-    var coord_array = this.id.split('-');
-    var coord_hash = {x: coord_array[0], y: coord_array[1]};
+    //var coord_array = this.id.split('-');
+    //var coord_hash = {x: coord_array[0], y: coord_array[1]};
     
     // how to set the style of the cell when it's clicked
     if (this.getAttribute('data-status') == 'dead') {
@@ -56,8 +62,16 @@ GameOfLife.prototype.setupBoardEvents = function() {
     }
   };
   
-  var cell00 = document.getElementById('0-0');
-  cell00.onclick = onCellClick;
+ // var cell00 = document.getElementById('0-0');
+ // cell00.onclick = onCellClick;
+
+for (var w=0; w<this.width; w++) {
+  for (var h=0; h<this.height; h++) {
+     var cell = document.getElementById(w+'-'+h);
+     cell.onclick = onCellClick;
+  }
+}
+
 };
 
 GameOfLife.prototype.step = function () {
@@ -65,7 +79,44 @@ GameOfLife.prototype.step = function () {
   // on the board and determine, based on it's neighbors,
   // whether the cell should be dead or alive in the next
   // evolution of the game
-  
+  console.log("clicked")
+  var newstate = [];
+
+  for (var w=0; w<this.width; w++) {    
+    for (var h=0; h<this.height; h++) {
+      var number_of_neighbors = 0;
+      var cell=document.getElementById(w+'-'+h);
+      for (var i=-1; i<=1; i++) {
+        for (var j=-1; j<=1; j++) {
+          var neighbor = document.getElementById((w+i)+'-'+(h+j));
+          if ((neighbor != null) && (neighbor.getAttribute('data-status') == 'alive') && (i+"-"+j != "0-0")) {
+        //  console.log(i+'-'+j);
+        number_of_neighbors++;
+
+      }
+
+    }
+  }
+ // console.log(number_of_neighbors);
+ if ((number_of_neighbors===3) && (cell.getAttribute('data-status') == 'dead')) {
+  newstate.push([w,h,"alive"])
+  console.log(newstate); 
+} else if ((number_of_neighbors<2) && (cell.getAttribute('data-status') == 'alive')) {
+  newstate.push([w,h,"dead"])
+} else if ((number_of_neighbors>3) && (cell.getAttribute('data-status') == 'alive')) {
+    newstate.push([w,h,"dead"])
+}
+}
+} 
+
+for (var key in newstate) {
+  var cell=document.getElementById(newstate[key][0]+"-"+newstate[key][1]);
+  cell.className = newstate[key][2];
+   cell.setAttribute('data-status', newstate[key][2]);
+}
+
+newstate=[];
+
 };
 
 GameOfLife.prototype.enableAutoPlay = function () {
@@ -74,5 +125,5 @@ GameOfLife.prototype.enableAutoPlay = function () {
   
 };
 
-var gol = new GameOfLife(20,20);
+var gol = new GameOfLife(10,10);
 gol.createAndShowBoard();
